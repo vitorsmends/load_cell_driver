@@ -28,8 +28,10 @@ ForceSensorNode::ForceSensorNode()
 
 void ForceSensorNode::loadParameters()
 {
+    this->declare_parameter<bool>("verbose", kVerbose);
     this->declare_parameter<std::string>("serial_port", kSerialPort);
     this->declare_parameter<int>("baudrate", kBaudrate);
+    this->get_parameter<bool>("verbose", verbose_);
     this->get_parameter<std::string>("serial_port", serial_port_);
     this->get_parameter<int>("baudrate", baudrate_);
 }
@@ -167,25 +169,32 @@ void ForceSensorNode::publish_forces(const std::vector<std::pair<int, float>> &d
     msg.data.resize(max_id + 1, 0.0);
 
     for (const auto &[id, force] : data) {
-        if (id >= 0 && static_cast<size_t>(id) < msg.data.size()) {
+        if (id >= 0 && static_cast<size_t>(id) < msg.data.size())
+        {
             msg.data[id] = force;
         }
     }
 
     force_vector_pub_->publish(msg);
-    RCLCPP_INFO(this->get_logger(), "Published force vector of size: %zu", msg.data.size());
+
+    if (verbose_)
+    {
+        RCLCPP_INFO(this->get_logger(), "Published force vector of size: %zu",
+        msg.data.size());
+    }
 }
 
 
 void ForceSensorNode::update_loop()
 {
     std::string packet = readPacket();
-
-    if (!packet.empty()) {
+    std::vector<std::pair<int, float>> data = extractPacket(packet);
+    publish_forces(data);
+    
+    if (verbose_)
+    {
         RCLCPP_INFO(this->get_logger(), "Received packet: %s", packet.c_str());
-        std::vector<std::pair<int, float>> data = extractPacket(packet);
         RCLCPP_INFO(this->get_logger(), "Extracted %lu values", data.size());
-        publish_forces(data);
     }
 }
 

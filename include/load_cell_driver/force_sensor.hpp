@@ -82,6 +82,12 @@ private:
     /** @brief File descriptor for the opened serial port. */
     int serial_fd_;
 
+    /** @brief Default verbose option. */
+    bool kVerbose = false;
+
+    /** @brief Actual verbose option loaded from parameters. */
+    bool verbose_;
+
     /** @brief Default serial port path (used as fallback). */
     std::string kSerialPort = "/dev/ttyUSB0";
 
