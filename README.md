@@ -7,7 +7,6 @@ This ROS 2 package provides a driver for reading data from a load cell via seria
 - Reads force data from a serial interface.
 - Publishes parsed data to a `std_msgs/msg/Float64MultiArray` message.
 - Configurable serial port, baudrate, and verbosity.
-- Optional serial communication disabling for testing.
 
 ## Dependencies
 
