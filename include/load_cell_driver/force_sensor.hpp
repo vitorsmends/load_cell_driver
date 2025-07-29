@@ -23,11 +23,15 @@ public:
   /**
    * @brief Constructor for the ForceSensorNode class.
    *
-   * Initializes parameters, opens the serial port, and sets up the publisher and timer.
+   * Initializes the ROS 2 node with the provided options, declares and retrieves
+   * configuration parameters, attempts to open the serial port for the load cell,
+   * sets up the force data publisher, and starts the update loop timer.
+   *
+   * @param options Node options passed to the rclcpp::Node base class,
+   * allowing for parameter overrides and remapping.
    */
-  ForceSensorNode();
+  ForceSensorNode(const rclcpp::NodeOptions & options);
 
-private:
   /**
    * @brief Loads configurable parameters from the ROS 2 parameter server,
    * including serial port path, baudrate, and timer interval.
@@ -80,25 +84,32 @@ private:
   void update_loop();
 
   /** @brief File descriptor for the opened serial port. */
-  int serial_fd_;
+  int serial_fd_ = 0;
+  
+  /** @brief Default enable serial option. */
+  bool kEnableSerial = true;
 
   /** @brief Default verbose option. */
   bool kVerbose = false;
 
   /** @brief Actual verbose option loaded from parameters. */
-  bool verbose_;
+  bool verbose_ = false;
 
   /** @brief Default serial port path (used as fallback). */
   std::string kSerialPort = "/dev/ttyUSB0";
 
-  /** @brief Actual serial port path loaded from parameters. */
-  std::string serial_port_;
-
   /** @brief Default baudrate (used as fallback). */
   int kBaudrate = 57600;
 
+private:
+  /** @brief Actual serial port path loaded from parameters. */
+  std::string serial_port_;
+
   /** @brief Actual baudrate loaded from parameters. */
-  int baudrate_;
+  bool enable_serial_ = false;
+
+  /** @brief Actual baudrate loaded from parameters. */
+  int baudrate_ = 0;
 
   /** @brief Default timer interval in milliseconds (used as fallback). */
   int kTimer = 10;

@@ -3,13 +3,15 @@
 namespace load_cell_driver
 {
 
-ForceSensorNode::ForceSensorNode()
-: Node("force_sensor_node")
+ForceSensorNode::ForceSensorNode(const rclcpp::NodeOptions & options)
+: Node("force_sensor_node", options)
 {
   loadParameters();
 
-  try {
-    if (!openSerialPort(serial_port_, baudrate_)) {
+  try
+  {
+    if (!openSerialPort(serial_port_, baudrate_) && enable_serial_)
+    {
       throw std::runtime_error("Serial open failed");
     }
   } catch (const std::exception & e) {
@@ -28,9 +30,11 @@ ForceSensorNode::ForceSensorNode()
 
 void ForceSensorNode::loadParameters()
 {
+  this->declare_parameter<bool>("enable_serial", kEnableSerial);
   this->declare_parameter<bool>("verbose", kVerbose);
   this->declare_parameter<std::string>("serial_port", kSerialPort);
   this->declare_parameter<int>("baudrate", kBaudrate);
+  this->get_parameter<bool>("enable_serial", enable_serial_);
   this->get_parameter<bool>("verbose", verbose_);
   this->get_parameter<std::string>("serial_port", serial_port_);
   this->get_parameter<int>("baudrate", baudrate_);
@@ -199,12 +203,3 @@ void ForceSensorNode::update_loop()
 }
 
 } // namespace load_cell_driver
-
-
-int main(int argc, char ** argv)
-{
-  rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<load_cell_driver::ForceSensorNode>());
-  rclcpp::shutdown();
-  return 0;
-}

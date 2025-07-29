@@ -1,5 +1,6 @@
 force_sensor_node:
   ros__parameters:
     verbose: false
-    serial_port: "/dev/ttyUSB0"
+    serial_port: "/dev/ttyUSB1"
     baudrate: 57600
+    enable_serial: true
